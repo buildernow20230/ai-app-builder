@@ -4,14 +4,22 @@ import { z } from "zod";
 import { loadConfig } from "./config.js";
 import { DOMAINS, DOMAIN_KEYS } from "./domains.js";
 import { AppGenerator } from "./ai/generator.js";
+import { DemoGenerator } from "./ai/demo-generator.js";
+import type { Generator } from "./ai/types.js";
 
 const config = loadConfig();
-const generator = new AppGenerator(config.ANTHROPIC_API_KEY, config.ANTHROPIC_MODEL);
+const generator: Generator = config.ANTHROPIC_API_KEY
+  ? new AppGenerator(config.ANTHROPIC_API_KEY, config.ANTHROPIC_MODEL)
+  : new DemoGenerator();
 
 const app = Fastify({ logger: true });
 await app.register(cors, { origin: config.WEB_ORIGIN });
 
-app.get("/health", async () => ({ status: "ok" }));
+if (generator.mode === "demo") {
+  app.log.warn("ANTHROPIC_API_KEY غير موجود: الخادم شغال في الوضع التجريبي");
+}
+
+app.get("/health", async () => ({ status: "ok", mode: generator.mode }));
 
 app.get("/domains", async () =>
   DOMAIN_KEYS.map((key) => ({ key, label: DOMAINS[key].label })),

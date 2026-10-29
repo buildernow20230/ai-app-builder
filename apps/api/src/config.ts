@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 const EnvSchema = z.object({
-  ANTHROPIC_API_KEY: z.string().min(1, "ANTHROPIC_API_KEY مطلوب"),
+  // لو فاضي، الخادم يشتغل في الوضع التجريبي ويرجّع تطبيقات أمثلة بدون تكلفة
+  ANTHROPIC_API_KEY: z.string().trim().default(""),
   ANTHROPIC_MODEL: z.string().default("claude-sonnet-5-5"),
   PORT: z.coerce.number().int().positive().default(3001),
   WEB_ORIGIN: z.string().default("http://localhost:5173"),

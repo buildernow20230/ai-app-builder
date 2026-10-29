@@ -17,6 +17,14 @@ export function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<GenerateResponse | null>(null);
+  const [mode, setMode] = useState<"live" | "demo" | null>(null);
+
+  useEffect(() => {
+    fetch("/api/health")
+      .then((r) => r.json())
+      .then((h: { mode: "live" | "demo" }) => setMode(h.mode))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/domains")
@@ -52,6 +60,9 @@ export function App() {
       <aside className="panel">
         <h1>ابنِ تطبيقك</h1>
         <p className="hint">اوصف التطبيق اللي محتاجه بالعربي، وهنبنيه لك.</p>
+        {mode === "demo" && (
+          <p className="demo-badge">وضع تجريبي: النتيجة تطبيق مثال ثابت، والتوليد الحقيقي يشتغل لما تضيف مفتاح Anthropic.</p>
+        )}
 
         <label htmlFor="domain">المجال</label>
         <select id="domain" value={domain} onChange={(e) => setDomain(e.target.value)}>

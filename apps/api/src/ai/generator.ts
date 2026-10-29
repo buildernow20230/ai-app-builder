@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { DOMAINS, type DomainKey } from "../domains.js";
+import { DOMAINS } from "../domains.js";
+import type { GenerateInput, GenerateResult, Generator } from "./types.js";
 
 const SYSTEM_PROMPT = `أنت مولّد تطبيقات ويب لمستخدمين عرب.
 - اكتب تطبيق ويب كامل في ملف HTML واحد (HTML + CSS + JavaScript داخل الملف).
@@ -9,18 +10,8 @@ const SYSTEM_PROMPT = `أنت مولّد تطبيقات ويب لمستخدمي�
 - الأرقام والتواريخ بتنسيق مناسب للعربية، والعملة الافتراضية الجنيه المصري.
 - أرجع ملف HTML فقط بدون أي شرح وبدون علامات Markdown.`;
 
-export interface GenerateInput {
-  prompt: string;
-  domain: DomainKey;
-}
-
-export interface GenerateResult {
-  html: string;
-  usage: { inputTokens: number; outputTokens: number };
-  model: string;
-}
-
-export class AppGenerator {
+export class AppGenerator implements Generator {
+  readonly mode = "live" as const;
   private client: Anthropic;
 
   constructor(apiKey: string, private model: string) {
